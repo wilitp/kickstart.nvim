@@ -178,6 +178,15 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+    config = pcall(
+      function()
+        vim.keymap.set('n', '<leader>gj', ":Gitsigns next_hunk<CR>", { desc = '[G]it Next([j]) Hunk' })
+        vim.keymap.set('n', '<leader>gk', ":Gitsigns prev_hunk<CR>", { desc = '[G]it Prev([k]) Hunk' })
+        vim.keymap.set('n', '<leader>gb', ":Gitsigns blame_line<CR>", { desc = '[G]it [b]lame line' })
+        vim.keymap.set('n', '<leader>gB', ":Gitsigns blame<CR>", { desc = '[G]it [B]lame file' })
+      end
+
+    )
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
