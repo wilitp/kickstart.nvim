@@ -405,6 +405,12 @@ do
     end,
   }
 
+  -- Extra git keymaps
+  vim.keymap.set('n', '<leader>gj', function() gitsigns.nav_hunk 'next' end, { desc = '[G]it Next([j]) Hunk' })
+  vim.keymap.set('n', '<leader>gk', function() gitsigns.nav_hunk 'prev' end, { desc = '[G]it Prev([k]) Hunk' })
+  vim.keymap.set('n', '<leader>gb', '<cmd>Gitsigns blame_line<CR>', { desc = '[G]it [b]lame line' })
+  vim.keymap.set('n', '<leader>gB', '<cmd>Gitsigns blame<CR>', { desc = '[G]it [B]lame file' })
+
   -- Transparency
   vim.pack.add { gh 'xiyaowong/transparent.nvim' }
 
