@@ -81,6 +81,12 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Tabs
+
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -178,15 +184,12 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
-    config = pcall(
-      function()
-        vim.keymap.set('n', '<leader>gj', ":Gitsigns next_hunk<CR>", { desc = '[G]it Next([j]) Hunk' })
-        vim.keymap.set('n', '<leader>gk', ":Gitsigns prev_hunk<CR>", { desc = '[G]it Prev([k]) Hunk' })
-        vim.keymap.set('n', '<leader>gb', ":Gitsigns blame_line<CR>", { desc = '[G]it [b]lame line' })
-        vim.keymap.set('n', '<leader>gB', ":Gitsigns blame<CR>", { desc = '[G]it [B]lame file' })
-      end
-
-    )
+    config = pcall(function()
+      vim.keymap.set('n', '<leader>gj', ':Gitsigns next_hunk<CR>', { desc = '[G]it Next([j]) Hunk' })
+      vim.keymap.set('n', '<leader>gk', ':Gitsigns prev_hunk<CR>', { desc = '[G]it Prev([k]) Hunk' })
+      vim.keymap.set('n', '<leader>gb', ':Gitsigns blame_line<CR>', { desc = '[G]it [b]lame line' })
+      vim.keymap.set('n', '<leader>gB', ':Gitsigns blame<CR>', { desc = '[G]it [B]lame file' })
+    end),
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -204,7 +207,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -252,7 +255,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -306,10 +309,11 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
 
-
       -- Diagnostic
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', 'gl', function() vim.diagnostic.open_float() end, { desc = 'Show Diagnostic' })
+      vim.keymap.set('n', 'gl', function()
+        vim.diagnostic.open_float()
+      end, { desc = 'Show Diagnostic' })
 
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -353,7 +357,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'Bilal2453/luvit-meta',     lazy = true },
+  { 'Bilal2453/luvit-meta', lazy = true },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -365,7 +369,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -520,7 +524,7 @@ require('lazy').setup({
         -- tsserver = {},
         --
         tsserver = {
-          filetypes = { "typescript", "typescriptreact" },
+          filetypes = { 'typescript', 'typescriptreact', 'javascript' },
         },
 
         lua_ls = {
@@ -724,14 +728,14 @@ require('lazy').setup({
   },
   {
     'akinsho/bufferline.nvim',
-    version = "*",
+    version = '*',
     dependencies = 'nvim-tree/nvim-web-devicons',
     init = function()
-      require("bufferline").setup {}
+      require('bufferline').setup {}
 
       vim.keymap.set('n', '<S-l>', ':bn<CR>', { desc = 'Change buffer right' })
       vim.keymap.set('n', '<S-h>', ':bp<CR>', { desc = 'Change buffer left' })
-    end
+    end,
   },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
