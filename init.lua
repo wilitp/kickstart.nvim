@@ -147,6 +147,11 @@ do
   vim.o.splitright = true
   vim.o.splitbelow = true
 
+  -- Tabs
+  vim.opt.tabstop = 2
+  vim.opt.shiftwidth = 2
+  vim.opt.expandtab = true
+
   -- Sets how neovim will display certain whitespace characters in the editor.
   --  See `:help 'list'`
   --  and `:help 'listchars'`
