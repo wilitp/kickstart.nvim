@@ -435,23 +435,80 @@ do
   }
 
   -- [[ Colorscheme ]]
-  -- You can easily change to a different colorscheme.
-  -- Change the name of the colorscheme plugin below, and then
-  -- change the command under that to load whatever the name of that colorscheme is.
-  --
-  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  -- macOS dark mode uses tokyonight-moon. macOS light mode uses tokyonight-day.
+  -- The terminal reports its own background after startup, and macOS does not
+  -- notify Neovim when the appearance changes, so the choice is re-applied on both.
   vim.pack.add { gh 'folke/tokyonight.nvim' }
   ---@diagnostic disable-next-line: missing-fields
   require('tokyonight').setup {
+    style = 'moon', -- macOS dark mode
     styles = {
       comments = { italic = false }, -- Disable italics in comments
     },
   }
 
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  local appearance = { applying = false }
+
+  ---@return boolean
+  local function system_is_dark()
+    if vim.fn.has 'mac' ~= 1 then
+      return vim.o.background ~= 'light'
+    end
+    local result = vim.system({ 'defaults', 'read', '-g', 'AppleInterfaceStyle' }, { text = true }):wait()
+    return result.code == 0 and (result.stdout or ''):find('Dark', 1, true) ~= nil
+  end
+
+  ---@param is_dark boolean
+  local function apply_system_theme(is_dark)
+    local background = (is_dark and 'dark') or 'light'
+    local colorscheme = (is_dark and 'tokyonight-moon') or 'tokyonight-day'
+    if vim.o.background == background and vim.g.colors_name == colorscheme then
+      return
+    end
+
+    appearance.applying = true
+    if vim.o.background ~= background then
+      vim.o.background = background
+    end
+    if vim.g.colors_name ~= colorscheme then
+      vim.cmd.colorscheme(colorscheme)
+    end
+    appearance.applying = false
+  end
+
+  apply_system_theme(system_is_dark())
+
+  if vim.fn.has 'mac' == 1 then
+    vim.api.nvim_create_autocmd('OptionSet', {
+      group = vim.api.nvim_create_augroup('tokyonight-system-appearance', { clear = true }),
+      pattern = 'background',
+      desc = 'Keep TokyoNight aligned with the macOS appearance',
+      callback = function()
+        if appearance.applying then
+          return
+        end
+        apply_system_theme(system_is_dark())
+      end,
+    })
+
+    local pending = false
+    local timer = assert(vim.uv.new_timer())
+    appearance.timer = timer
+    timer:start(1000, 1000, function()
+      if pending then
+        return
+      end
+      pending = true
+      vim.system({ 'defaults', 'read', '-g', 'AppleInterfaceStyle' }, { text = true }, function(result)
+        pending = false
+        local is_dark = result.code == 0 and (result.stdout or ''):find('Dark', 1, true) ~= nil
+        vim.schedule(function()
+          apply_system_theme(is_dark)
+        end)
+      end)
+    end)
+    timer:unref()
+  end
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -760,9 +817,11 @@ do
   local servers = {
     -- clangd = {},
     -- gopls = {},
-    -- pyright = {},
+    pyright = {
+      filetypes = {'python'}
+    },
     tsc = {
-      filetypes = { 'typescript', 'typescriptreact' },
+      filetypes = { 'typescript', 'typescriptreact', 'javascript' },
     },
     --
     -- Some languages (like rust) have entire language plugins that can be useful:
